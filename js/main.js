@@ -125,7 +125,7 @@ $(function () {
 
     function initPage() {
         $.ajax({
-            'async': true,
+            'async': false,
             'global': false,
             'url': "./sites.json",
             'dataType': "json",
@@ -169,7 +169,7 @@ $(function () {
     function newAJAX(allSites) {
         sites = allSites // cant be deleted, only way this information be available inside ajax
         $.ajax({
-            'async': true,
+            'async': false,
             'global': false,
             'url': "./storeScores.json",
             'success': function (data) {
@@ -333,7 +333,7 @@ function getInvoice() {
     open_number_votes = Number(document.getElementById("amountbox").value)
     console.log("getting invoice for storeID=" + openStoreID + " direction=" + openDirection + " amount=" + open_number_votes)
     $.ajax({
-        'async': true,
+        'async': false,
         'global': false,
         'url': './get_invoice?storeID=' + openStoreID + '&direction=' + openDirection + '&amount=' + open_number_votes,
         'success': function (data) {
@@ -346,7 +346,7 @@ function getInvoice() {
 function checkPayment() {
     if (! open_paid_invoice_added){
     $.ajax({
-        'async': true,
+        'async': false,
         'global': false,
         'url': "./check_payment?id=" + openPaymentID,
         'success': function (data) {
@@ -518,7 +518,7 @@ function sendEditMail(storeID){
     site = get_site(storeID)
 
     $.ajax({
-        'async': true,
+        'async': false,
         'global': false,
         'url': "./suggestEdit?id=" + site.id + "&name=" + site.name + "&message=" + extractedMessage,
         'success': function () {
@@ -547,7 +547,7 @@ function sendBanMail(storeID){
     site = get_site(storeID)
 
     $.ajax({
-        'async': true,
+        'async': false,
         'global': false,
         'url': "./suggestBan?id=" + site.id + "&name=" + site.name + "&message=" + extractedMessage,
         'success': function () {
