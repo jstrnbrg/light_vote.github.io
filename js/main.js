@@ -180,7 +180,7 @@ $(function () {
 
     function processAndDisplay(scoresAJAX) {
         scores = scoresAJAX
-        scores = JSON.parse(scores)
+        //scores = JSON.parse(scores)
         displayData()
     }
 
