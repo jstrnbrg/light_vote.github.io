@@ -9,7 +9,7 @@ var selected_trendy = 'all';
 // website is considered new if added in less than this number of seconds (one week)
 var new_during = 7 * 24 * 60 * 60;
 var trendingThreshold = 30;
-var sectorList = ['Technology', 'security', 'clothing', 'exchange', 'food', 'games&casino', 'adult', 'art', 
+var sectorList = ['Technology', 'security', 'clothing', 'exchange', 'food', 'games&casino', 'adult', 'art',
                 'drugs&supplements', 'cryptocurrency merchandise', 'other']
 
 function filtraPorSector(sector, delivery, size, newQ, trendyQ) {
@@ -55,16 +55,16 @@ function filtraPorSector(sector, delivery, size, newQ, trendyQ) {
         within = (newQ == 'yes' && elapsed < new_during) || (newQ == 'no' && elapsed > new_during)
 
         //check if trending
-        trendy = (trendyQ == 'yes' && get_trendingScore(site.id)) >= trendingThreshold  || (trendyQ == 'no' && get_trendingScore(site.id) <= trendingThreshold) 
-        
+        trendy = (trendyQ == 'yes' && get_trendingScore(site.id)) >= trendingThreshold  || (trendyQ == 'no' && get_trendingScore(site.id) <= trendingThreshold)
+
         //console.log('checking ' + site.name)
         panels[idx].style.display = "block";
         left_panel[idx].style.display = "block";
-        sectorOrDeliveryFail = (((sector != 'all') && (site.sector != sector)) || ((delivery != 'all') && (site.digital_goods != delivery)) || 
+        sectorOrDeliveryFail = (((sector != 'all') && (site.sector != sector)) || ((delivery != 'all') && (site.digital_goods != delivery)) ||
         ((size != 'all') && (site.size != size)))
         newOrTrendyFail = ((newQ != 'all') && !within) || ( (trendyQ != 'all') && !trendy)
         eitherNewOrTrendy = ( get_trendingScore(site.id) >= trendingThreshold || elapsed < new_during )
-        
+
         if (trendyQ == 'or' && newQ == 'or'){
             if (sectorOrDeliveryFail || !eitherNewOrTrendy){
                 panels[idx].style.display = "none";
@@ -112,7 +112,7 @@ function build_panel(site, score) {
     }
 
     inject = inject + '<i class="fas fa-edit" id="edit' + site.id + '"></i> <i class="fas fa-ban" id="ban' + site.id + '"></i>'
-    
+
     inject = inject + '</h5>' +
         '<p class="text-muted" >' + site.description + '</p>' +
         '<p style="font-size:smaller"><strong>URI:</strong> ' + site.uri + '</p>' +
@@ -125,7 +125,7 @@ $(function () {
 
     function initPage() {
         $.ajax({
-            'async': false,
+            'async': true,
             'global': false,
             'url': "./sites.json",
             'dataType': "json",
@@ -169,7 +169,7 @@ $(function () {
     function newAJAX(allSites) {
         sites = allSites // cant be deleted, only way this information be available inside ajax
         $.ajax({
-            'async': false,
+            'async': true,
             'global': false,
             'url': "./storeScores.json",
             'success': function (data) {
@@ -314,7 +314,7 @@ function clickLinkNew() {
     } else {
         selected_new = 'all'
     }
-    
+
     if (selected_newTrendy.includes('trendy')){
         selected_trendy = 'yes'
     } else {
@@ -333,7 +333,7 @@ function getInvoice() {
     open_number_votes = Number(document.getElementById("amountbox").value)
     console.log("getting invoice for storeID=" + openStoreID + " direction=" + openDirection + " amount=" + open_number_votes)
     $.ajax({
-        'async': false,
+        'async': true,
         'global': false,
         'url': './get_invoice?storeID=' + openStoreID + '&direction=' + openDirection + '&amount=' + open_number_votes,
         'success': function (data) {
@@ -346,7 +346,7 @@ function getInvoice() {
 function checkPayment() {
     if (! open_paid_invoice_added){
     $.ajax({
-        'async': false,
+        'async': true,
         'global': false,
         'url': "./check_payment?id=" + openPaymentID,
         'success': function (data) {
@@ -361,7 +361,7 @@ function updateModal(data) {
     if ((data == 'true' || Number(data) == 'true' || data.trim() == 'true') && !open_paid_invoice_added) {
         console.log("payment received")
         document.getElementById("qrcodediv").innerHTML = '<img id="qrcode" src="https://upload.wikimedia.org/wikipedia/commons/8/8c/White_check_mark_in_dark_green_rounded_square.svg" >'
-        
+
         if (scores[openStoreID.toString()] == null) { var upvotes = 0 } else { var upvotes = scores[openStoreID.toString()][0] }
         if (scores[openStoreID.toString()] == null) { var downvotes = 0 } else { var downvotes = scores[openStoreID.toString()][1] }
         if (openDirection == 'Upvote') {
@@ -373,13 +373,13 @@ function updateModal(data) {
         //scores[openStoreID.toString()][1] = downvotes
 
         new_score = get_score(openStoreID)
-        
+
         if (new_score < 0) { var score_color = 'blue' } else if (new_score > 0) { var score_color = 'red' } else { var score_color = 'black' }
         if (Math.abs(new_score) >= 1000000) { new_score = Math.round(new_score / 100000) / 10 + 'M' } else if (Math.abs(new_score) >= 1000) { new_score = Math.round(new_score / 100) / 10 + 'k' }
         document.getElementById('store' + openStoreID).innerHTML = new_score
         document.getElementById('store' + openStoreID).style.color = score_color
 
-        
+
         query = "#store" + openStoreID.toString()
         var element = $(query)
         $(query).popover('dispose')
@@ -500,8 +500,8 @@ function makeScoresPopover(upvotes, downvotes, trendingScore) {
 
 function makeEditPopover(storeID){
     site = get_site(storeID)
-    popover_content = '<div class="form-group"><label for="exampleFormControlTextarea1">Suggest an edit for ' + site.name + 
-    ':</label> <textarea class="form-control" id="editForm' + storeID + '" rows="8" >What to change (Name, URL, ...): \nReason:</textarea></div>' + 
+    popover_content = '<div class="form-group"><label for="exampleFormControlTextarea1">Suggest an edit for ' + site.name +
+    ':</label> <textarea class="form-control" id="editForm' + storeID + '" rows="8" >What to change (Name, URL, ...): \nReason:</textarea></div>' +
     '<button onclick=sendEditMail(' + storeID + ')>Send</button>'
 
     var settings = {
@@ -518,7 +518,7 @@ function sendEditMail(storeID){
     site = get_site(storeID)
 
     $.ajax({
-        'async': false,
+        'async': true,
         'global': false,
         'url': "./suggestEdit?id=" + site.id + "&name=" + site.name + "&message=" + extractedMessage,
         'success': function () {
@@ -529,8 +529,8 @@ function sendEditMail(storeID){
 
 function makeBanPopover(storeID){
     site = get_site(storeID)
-    popover_content = '<div class="form-group"><label for="exampleFormControlTextarea1">Suggest to ban ' + site.name + 
-    ':</label> <textarea class="form-control" id="banForm' + storeID + '" rows="8">Reason:</textarea></div>' + 
+    popover_content = '<div class="form-group"><label for="exampleFormControlTextarea1">Suggest to ban ' + site.name +
+    ':</label> <textarea class="form-control" id="banForm' + storeID + '" rows="8">Reason:</textarea></div>' +
     '<button onclick=sendBanMail(' + storeID + ')>Send</button>'
 
     var settings = {
@@ -547,7 +547,7 @@ function sendBanMail(storeID){
     site = get_site(storeID)
 
     $.ajax({
-        'async': false,
+        'async': true,
         'global': false,
         'url': "./suggestBan?id=" + site.id + "&name=" + site.name + "&message=" + extractedMessage,
         'success': function () {
@@ -565,7 +565,7 @@ $(document).ready(function(){
         if (scores[storeId] == null) { var upvotes = 0 } else { var upvotes = scores[storeId][0] }
         if (scores[storeId] == null) { var downvotes = 0 } else { var downvotes = scores[storeId][1] }
         if (scores[storeId] == null) { var trendingScore = 0 } else { var trendingScore = scores[storeId][2] }
-        
+
         $(query).popover(makeScoresPopover(upvotes, downvotes, trendingScore));
     }
     //add event listners to suggest an edit
